@@ -63,10 +63,23 @@ module.exports = (course, stepCallback) => {
                 return;
             }
             // Filter for existing LTI assignments
-            // assignments.map(assignment => console.log(assignment));
+            // var externalTools = assignments.filter(assignment => assignment.submission_types.includes('external_tool'));
+            // console.log(externalTools.length);
             callback(null, individualModule);
         });
     }
+
+    function create_W05_feedback() {
+
+    };
+
+    function create_W12_feedback() {
+        
+    };
+
+    function create_W13_feedback() {
+        
+    };
 
     function createAssignments(individualModule, callback) {
         course.message("Creating assignments now");
@@ -91,14 +104,14 @@ module.exports = (course, stepCallback) => {
         // create LTI assignments
         canvas.post(`/api/v1/courses/${canvasId}/assignments`, {
             assignment: {
-                "name": `${weekNum} Student Feedback`,
-                "description": `The name of the module that this will go in is, ${individualModule.name}`,
+                "name": `W${weekNum} Student Feedback to Instructor`,
+                // "description": `The name of the module that this will go in is, ${individualModule.name}`,
                 "external_tool_tag_attributes": {
-                    'url': "www.google.com",
+                    'url': "https://byui-lti-to-url.azurewebsites.net:443/Home/UrlRoute/ZHVybD1odHRwcyUzQSUyRiUyRmJ5dWkuYXoxLnF1YWx0cmljcy5jb20lMkZqZmUlMkZmb3JtJTJGU1ZfM09oT3dPZE9XU2owSzhkJmNoZWNrZW09b24maW51bT1vbiZmbG5hbWU9b24mZW1haWw9b24mdXNlcm49b24mY291cnNlbmFtZT1vbiZzaXNjSUQ9b24mY291cnNlbnVtPW9uJnNlY251bT1vbiZzaXN0SUQ9/b24maWVtYWlsPW9uJmlmbmFtZT1vbiZpbG5hbWU9b24mbW9kdWxlPW9uJmxuYW1lPW9uJmxpZD1vbiZncmFkZT1vbiZwb2ludHM9MSZoYWJpdHVkZV9MTVM9Q2FudmFzJmhhYml0dWRlX1dlZWtObz01JmxvYz1uZXc1",
                     'new_tab': false
-                }//,
-                // Submission_types doesn't work
-                // "submission_types": ['online_text_entry']
+                },
+                "submission_types": 'external_tool',
+                "omit_from_final_grade": true
             }
         }, (postError, newAssignment) => {
             if (postError) {
