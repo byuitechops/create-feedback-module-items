@@ -55,7 +55,7 @@ module.exports = (course, stepCallback) => {
     }
 
     function checkForExistingAssignments(individualModule, callback) {
-        course.message("Checking for existing LTI assignments");
+        course.message("Checking for existing LTI assignments.");
         // check if assignments exist
         canvas.getAssignments(canvasId, (error, assignments) => {
             if (error) {
@@ -69,21 +69,62 @@ module.exports = (course, stepCallback) => {
         });
     }
 
-    function create_W05_feedback() {
+    function create_W05_feedback(callback) {
+        canvas.post(`/api/v1/courses/${canvasId}/assignments`, {
+            assignment: {
+                'name': `W05 Student Feedback to Instructor`,
+                // "description": `The name of the module that this will go in is, ${individualModule.name}`,
+                'external_tool_tag_attributes': {
+                    'url': "https://byui-lti-to-url.azurewebsites.net:443/Home/UrlRoute/ZHVybD1odHRwcyUzQSUyRiUyRmJ5dWkuYXoxLnF1YWx0cmljcy5jb20lMkZqZmUlMkZmb3JtJTJGU1ZfM09oT3dPZE9XU2owSzhkJmNoZWNrZW09b24maW51bT1vbiZmbG5hbWU9b24mZW1haWw9b24mdXNlcm49b24mY291cnNlbmFtZT1vbiZzaXNjSUQ9b24mY291cnNlbnVtPW9uJnNlY251bT1vbiZzaXN0SUQ9/b24maWVtYWlsPW9uJmlmbmFtZT1vbiZpbG5hbWU9b24mbW9kdWxlPW9uJmxuYW1lPW9uJmxpZD1vbiZncmFkZT1vbiZwb2ludHM9MSZoYWJpdHVkZV9MTVM9Q2FudmFzJmhhYml0dWRlX1dlZWtObz01JmxvYz1uZXc1",
+                    'new_tab': false
+                },
+                'submission_types': 'external_tool',
+                'omit_from_final_grade': true,
+                'published': true
+            }
+        }, (postError, newAssignment) => {
+            if (postError) {
+                callback(postError);
+            }
 
+            course.log('Created assignment', {
+                'Assignment Name': newAssignment.name
+            });
+
+            callback(null, newAssignment);
+        });
     };
 
-    function create_W12_feedback() {
-        
-    };
+    function create_W12_feedback(callback) {
+        canvas.post(`/api/v1/courses/${canvasId}/assignments`, {
+            assignment: {
+                'name': `W12 Student Feedback to Instructor`,
+                // "description": `The name of the module that this will go in is, ${individualModule.name}`,
+                'external_tool_tag_attributes': {
+                    'url': "https://byui-lti-to-url.azurewebsites.net:443/Home/UrlRoute/ZHVybD1odHRwcyUzQSUyRiUyRmJ5dWkuYXoxLnF1YWx0cmljcy5jb20lMkZqZmUlMkZmb3JtJTJGU1ZfODZNZThkUGt4WmxVMEhiJmNoZWNrZW09b24maW51bT1vbiZmbG5hbWU9b24mZW1haWw9b24mdXNlcm49b24mY291cnNlbmFtZT1vbiZzaXNjSUQ9b24mY291cnNlbnVtPW9uJnNlY251bT1vbiZzaXN0SUQ9/b24maWVtYWlsPW9uJmlmbmFtZT1vbiZpbG5hbWU9b24mbW9kdWxlPW9uJmxuYW1lPW9uJmxpZD1vbiZncmFkZT1vbiZwb2ludHM9MSZoYWJpdHVkZV9MTVM9Q2FudmFzJmhhYml0dWRlX1dlZWtObz0xMiZsb2M9bmV30",
+                    'new_tab': false
+                },
+                'submission_types': 'external_tool',
+                'omit_from_final_grade': true,
+                'published': true
+            }
+        }, (postError, newAssignment) => {
+            if (postError) {
+                callback(postError);
+            }
 
-    function create_W13_feedback() {
-        
+            course.log('Created assignment', {
+                'Assignment Name': newAssignment.name
+            });
+
+            callback(null, newAssignment);
+        });
     };
 
     function createAssignments(individualModule, callback) {
-        course.message("Creating assignments now");
+        course.message("Creating new assignments.");
 
+        // Grabs name of the module so that we can extract the week number for later use
         var moduleTitle = individualModule.name;
         var titleArray = moduleTitle.split(' ');
 
@@ -101,37 +142,68 @@ module.exports = (course, stepCallback) => {
             }
         });
 
-        // create LTI assignments
-        canvas.post(`/api/v1/courses/${canvasId}/assignments`, {
-            assignment: {
-                "name": `W${weekNum} Student Feedback to Instructor`,
-                // "description": `The name of the module that this will go in is, ${individualModule.name}`,
-                "external_tool_tag_attributes": {
-                    'url': "https://byui-lti-to-url.azurewebsites.net:443/Home/UrlRoute/ZHVybD1odHRwcyUzQSUyRiUyRmJ5dWkuYXoxLnF1YWx0cmljcy5jb20lMkZqZmUlMkZmb3JtJTJGU1ZfM09oT3dPZE9XU2owSzhkJmNoZWNrZW09b24maW51bT1vbiZmbG5hbWU9b24mZW1haWw9b24mdXNlcm49b24mY291cnNlbmFtZT1vbiZzaXNjSUQ9b24mY291cnNlbnVtPW9uJnNlY251bT1vbiZzaXN0SUQ9/b24maWVtYWlsPW9uJmlmbmFtZT1vbiZpbG5hbWU9b24mbW9kdWxlPW9uJmxuYW1lPW9uJmxpZD1vbiZncmFkZT1vbiZwb2ludHM9MSZoYWJpdHVkZV9MTVM9Q2FudmFzJmhhYml0dWRlX1dlZWtObz01JmxvYz1uZXc1",
-                    'new_tab': false
-                },
-                "submission_types": 'external_tool',
-                "omit_from_final_grade": true
-            }
-        }, (postError, newAssignment) => {
-            if (postError) {
-                callback(postError);
-            }
-
-            course.log('Created assignments', {
-                'Assignment Name': newAssignment.name
-                // 'Assignment Type': newAssignment.submission-types
+        // Depending the on week, do different tasks (e.g. create W12 feedback or W13 external url feedback)
+        switch (weekNum) {
+            case '05':
+            create_W05_feedback((error, assignment) => {
+                if (error) {
+                    callback(null, individualModule);
+                }
+                callback(null, individualModule, assignment);
             });
-
-            callback(null, individualModule, newAssignment);
-        });
+                break;
+            case '12':
+                create_W12_feedback((error, assignment) => {
+                    if (error) {
+                        callback(null, individualModule);
+                    }
+                    callback(null, individualModule, assignment);
+                });
+                break;
+            case '13':
+                callback(null, individualModule, "ExternalURL");
+                break;
+            default:
+                // Module doesn't match these three cases.
+                callback(null, individualModule, null);
+                break;
+        };
     }
 
     function insertModuleItems(individualModule, newAssignment, callback) {
         course.message("Inserting into modules");
-        // insert LTI assignments
-        // Potentially publish LTI assignments
-        // insert link
+
+        // Checks if the "new Assignment" is the external URL
+        if (newAssignment === "ExternalURL") {
+            canvas.post(`/api/v1/courses/${canvasId}/modules/${individualModule.id}/items`, {
+                module_item: {
+                    'title': "W13 End-of-course Evaluation",
+                    'type': 'ExternalUrl',
+                    'external_url': "https://content.byui.edu/integ/gen/8872d2b2-91d5-4953-a357-3097ef2aa5d0/0/?.vi=file&attachment.uuid=969ae80b-c9ec-4e8d-95f3-73a3cfbf5a76",
+                    'published': true
+                }
+            }, (postError, newModuleItem) => {
+                if (postError) {
+                    callback(postError);
+                }
+
+                course.message(`Successfully added the ${newModuleItem.title} to ${individualModule.name}`);
+            });
+        } else if(newAssignment != null) {
+            canvas.post(`/api/v1/courses/${canvasId}/modules/${individualModule.id}/items`, {
+                module_item: {
+                    'type': 'Assignment',
+                    'content_id': newAssignment.id,
+                    'published': true
+                }
+            }, (postError) => {
+                if (postError) {
+                    callback(postError);
+                }
+
+                course.message(`Successfully added ${newAssignment.name} to ${individualModule.name}`);
+            });
+        }
         callback(null, individualModule);
     }
 
