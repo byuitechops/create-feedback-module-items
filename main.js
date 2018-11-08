@@ -23,7 +23,7 @@ module.exports = (course, stepCallback) => {
     // Add "W13 End-of-Course Evaluation" to Week 13 (link)
 
 
-    // get modules
+    // Get modules
     function getModules() {
         canvas.getModules(canvasId, (error, modules) => {
             if (error) {
@@ -55,21 +55,40 @@ module.exports = (course, stepCallback) => {
     }
 
     function checkForExistingAssignments(individualModule, callback) {
-        course.message("Checking for existing LTI assignments.");
+        course.message("Checking for existing external tools.");
         // check if assignments exist
         canvas.getAssignments(canvasId, (error, assignments) => {
             if (error) {
                 callback(error);
                 return;
             }
+
             // Filter for existing LTI assignments
-            // var externalTools = assignments.filter(assignment => assignment.submission_types.includes('external_tool'));
+            // var existingExternalTools = assignments.filter(assignment => assignment.submission_types.includes('external_tool'));
             // console.log(externalTools.length);
+
             callback(null, individualModule);
         });
     }
 
     function create_W05_feedback(callback) {
+
+        canvas.getAssignments(canvasId, (error, assignments) => {
+            if (error) {
+                callback(error);
+                return;
+            }
+            // See if any of the assignment names include "W05 Student Feedback to Instructor"
+            var existingFeedbackAssignment = assignments.filter(assignment => assignment.name.includes("W05 Student Feedback to Instructor"));
+
+            // If so... do not create another one.
+            if (existingFeedbackAssignment.length > 0) {
+                // FIX THIS CALLBACK ("callback was already called") ---------------------------------------------------------------------------------------------------------------------------- *
+                callback(null, null);
+            }
+
+        });
+
         canvas.post(`/api/v1/courses/${canvasId}/assignments`, {
             assignment: {
                 'name': `W05 Student Feedback to Instructor`,
@@ -96,6 +115,23 @@ module.exports = (course, stepCallback) => {
     };
 
     function create_W12_feedback(callback) {
+
+        canvas.getAssignments(canvasId, (error, assignments) => {
+            if (error) {
+                callback(error);
+                return;
+            }
+            // See if any of the assignment names include "W05 Student Feedback to Instructor"
+            // CHANGE THIS TO W12 ---------------------------------------------------------------------------------------------------------------------------- *
+            var existingFeedbackAssignment = assignments.filter(assignment => assignment.name.includes("W05 Student Feedback to Instructor"));
+
+            // If so... do not create another one.
+            if (existingFeedbackAssignment.length > 0) {
+                callback(null, null);
+            }
+
+        });
+
         canvas.post(`/api/v1/courses/${canvasId}/assignments`, {
             assignment: {
                 'name': `W12 Student Feedback to Instructor`,
@@ -122,6 +158,9 @@ module.exports = (course, stepCallback) => {
     };
 
     function createAssignments(individualModule, callback) {
+        if (!individualModule) {
+            callback(null, null);
+        }
         course.message("Creating new assignments.");
 
         // Grabs name of the module so that we can extract the week number for later use
@@ -171,16 +210,21 @@ module.exports = (course, stepCallback) => {
     }
 
     function insertModuleItems(individualModule, newAssignment, callback) {
+        if (!individualModule) {
+            callback(null, null);
+        }
+
         course.message("Inserting into modules");
 
         // Checks if the "new Assignment" is the external URL
         if (newAssignment === "ExternalURL") {
             canvas.post(`/api/v1/courses/${canvasId}/modules/${individualModule.id}/items`, {
                 module_item: {
-                    'title': "W13 End-of-course Evaluation",
-                    'type': 'ExternalUrl',
+                    'title': "W13 End-of-Course Evaluation",
+                    'type': 'external_url',
                     'external_url': "https://content.byui.edu/integ/gen/8872d2b2-91d5-4953-a357-3097ef2aa5d0/0/?.vi=file&attachment.uuid=969ae80b-c9ec-4e8d-95f3-73a3cfbf5a76",
-                    'published': true
+                    'published': true,
+                    'new_tab': true
                 }
             }, (postError, newModuleItem) => {
                 if (postError) {
@@ -203,6 +247,8 @@ module.exports = (course, stepCallback) => {
 
                 course.message(`Successfully added ${newAssignment.name} to ${individualModule.name}`);
             });
+        } else {
+            callback(null, null);
         }
         callback(null, individualModule);
     }
@@ -225,6 +271,7 @@ module.exports = (course, stepCallback) => {
             callback(null);
         })
     }
+
     /* * * * * * * *
     * *
     * * * START HERE
@@ -238,4 +285,3 @@ module.exports = (course, stepCallback) => {
         getModules();
     }
 };
-
