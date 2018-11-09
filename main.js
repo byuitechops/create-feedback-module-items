@@ -54,24 +54,8 @@ module.exports = (course, stepCallback) => {
         });
     }
 
-    function checkForExistingAssignments(individualModule, callback) {
-        course.message("Checking for existing external tools.");
-        // check if assignments exist
-        canvas.getAssignments(canvasId, (error, assignments) => {
-            if (error) {
-                callback(error);
-                return;
-            }
-
-            // Filter for existing LTI assignments
-            // var existingExternalTools = assignments.filter(assignment => assignment.submission_types.includes('external_tool'));
-            // console.log(externalTools.length);
-
-            callback(null, individualModule);
-        });
-    }
-
     function create_W05_feedback(callback) {
+        var doesExist = false;
 
         canvas.getAssignments(canvasId, (error, assignments) => {
             if (error) {
@@ -83,85 +67,99 @@ module.exports = (course, stepCallback) => {
 
             // If so... do not create another one.
             if (existingFeedbackAssignment.length > 0) {
-                // FIX THIS CALLBACK ("callback was already called") ---------------------------------------------------------------------------------------------------------------------------- *
-                callback(null, null);
+                // callback(null, null);
+                doesExist = true;
+                return;
             }
 
         });
+        // This if statement runs before the "getAssignments" above ----------------------------------------------------------------------------------------------------
+        if (doesExist) {
+            course.message("Assignment already exists.");
+            callback(null, null);
+            return;
+        } else {
+            canvas.post(`/api/v1/courses/${canvasId}/assignments`, {
+                assignment: {
+                    'name': `W05 Student Feedback to Instructor`,
+                    // "description": `The name of the module that this will go in is, ${individualModule.name}`,
+                    'external_tool_tag_attributes': {
+                        'url': "https://byui-lti-to-url.azurewebsites.net:443/Home/UrlRoute/ZHVybD1odHRwcyUzQSUyRiUyRmJ5dWkuYXoxLnF1YWx0cmljcy5jb20lMkZqZmUlMkZmb3JtJTJGU1ZfM09oT3dPZE9XU2owSzhkJmNoZWNrZW09b24maW51bT1vbiZmbG5hbWU9b24mZW1haWw9b24mdXNlcm49b24mY291cnNlbmFtZT1vbiZzaXNjSUQ9b24mY291cnNlbnVtPW9uJnNlY251bT1vbiZzaXN0SUQ9/b24maWVtYWlsPW9uJmlmbmFtZT1vbiZpbG5hbWU9b24mbW9kdWxlPW9uJmxuYW1lPW9uJmxpZD1vbiZncmFkZT1vbiZwb2ludHM9MSZoYWJpdHVkZV9MTVM9Q2FudmFzJmhhYml0dWRlX1dlZWtObz01JmxvYz1uZXc1",
+                        'new_tab': false
+                    },
+                    'submission_types': 'external_tool',
+                    'omit_from_final_grade': true,
+                    'published': true
+                }
+            }, (postError, newAssignment) => {
+                if (postError) {
+                    callback(postError);
+                }
 
-        canvas.post(`/api/v1/courses/${canvasId}/assignments`, {
-            assignment: {
-                'name': `W05 Student Feedback to Instructor`,
-                // "description": `The name of the module that this will go in is, ${individualModule.name}`,
-                'external_tool_tag_attributes': {
-                    'url': "https://byui-lti-to-url.azurewebsites.net:443/Home/UrlRoute/ZHVybD1odHRwcyUzQSUyRiUyRmJ5dWkuYXoxLnF1YWx0cmljcy5jb20lMkZqZmUlMkZmb3JtJTJGU1ZfM09oT3dPZE9XU2owSzhkJmNoZWNrZW09b24maW51bT1vbiZmbG5hbWU9b24mZW1haWw9b24mdXNlcm49b24mY291cnNlbmFtZT1vbiZzaXNjSUQ9b24mY291cnNlbnVtPW9uJnNlY251bT1vbiZzaXN0SUQ9/b24maWVtYWlsPW9uJmlmbmFtZT1vbiZpbG5hbWU9b24mbW9kdWxlPW9uJmxuYW1lPW9uJmxpZD1vbiZncmFkZT1vbiZwb2ludHM9MSZoYWJpdHVkZV9MTVM9Q2FudmFzJmhhYml0dWRlX1dlZWtObz01JmxvYz1uZXc1",
-                    'new_tab': false
-                },
-                'submission_types': 'external_tool',
-                'omit_from_final_grade': true,
-                'published': true
-            }
-        }, (postError, newAssignment) => {
-            if (postError) {
-                callback(postError);
-            }
+                course.log('Created assignment', {
+                    'Assignment Name': newAssignment.name
+                });
 
-            course.log('Created assignment', {
-                'Assignment Name': newAssignment.name
+                callback(null, newAssignment);
             });
-
-            callback(null, newAssignment);
-        });
+        }
     };
 
     function create_W12_feedback(callback) {
-
+        var doesExist = false;
         canvas.getAssignments(canvasId, (error, assignments) => {
             if (error) {
                 callback(error);
                 return;
             }
             // See if any of the assignment names include "W05 Student Feedback to Instructor"
-            // CHANGE THIS TO W12 ---------------------------------------------------------------------------------------------------------------------------- *
+            // Change this to "W12 Student Feedback to Instructor" when you're done testing -------------------------------------------------------------------------------------------
             var existingFeedbackAssignment = assignments.filter(assignment => assignment.name.includes("W05 Student Feedback to Instructor"));
 
             // If so... do not create another one.
             if (existingFeedbackAssignment.length > 0) {
-                callback(null, null);
+                // callback(null, null);
+                doesExist = true;
+                return;
             }
 
         });
+        if (doesExist) {
+            course.message("Assignment already exists.");
+            callback(null, null);
+            return;
+        } else {
+            canvas.post(`/api/v1/courses/${canvasId}/assignments`, {
+                assignment: {
+                    'name': `W12 Student Feedback to Instructor`,
+                    // "description": `The name of the module that this will go in is, ${individualModule.name}`,
+                    'external_tool_tag_attributes': {
+                        'url': "https://byui-lti-to-url.azurewebsites.net:443/Home/UrlRoute/ZHVybD1odHRwcyUzQSUyRiUyRmJ5dWkuYXoxLnF1YWx0cmljcy5jb20lMkZqZmUlMkZmb3JtJTJGU1ZfODZNZThkUGt4WmxVMEhiJmNoZWNrZW09b24maW51bT1vbiZmbG5hbWU9b24mZW1haWw9b24mdXNlcm49b24mY291cnNlbmFtZT1vbiZzaXNjSUQ9b24mY291cnNlbnVtPW9uJnNlY251bT1vbiZzaXN0SUQ9/b24maWVtYWlsPW9uJmlmbmFtZT1vbiZpbG5hbWU9b24mbW9kdWxlPW9uJmxuYW1lPW9uJmxpZD1vbiZncmFkZT1vbiZwb2ludHM9MSZoYWJpdHVkZV9MTVM9Q2FudmFzJmhhYml0dWRlX1dlZWtObz0xMiZsb2M9bmV30",
+                        'new_tab': false
+                    },
+                    'submission_types': 'external_tool',
+                    'omit_from_final_grade': true,
+                    'published': true
+                }
+            }, (postError, newAssignment) => {
+                if (postError) {
+                    callback(postError);
+                }
 
-        canvas.post(`/api/v1/courses/${canvasId}/assignments`, {
-            assignment: {
-                'name': `W12 Student Feedback to Instructor`,
-                // "description": `The name of the module that this will go in is, ${individualModule.name}`,
-                'external_tool_tag_attributes': {
-                    'url': "https://byui-lti-to-url.azurewebsites.net:443/Home/UrlRoute/ZHVybD1odHRwcyUzQSUyRiUyRmJ5dWkuYXoxLnF1YWx0cmljcy5jb20lMkZqZmUlMkZmb3JtJTJGU1ZfODZNZThkUGt4WmxVMEhiJmNoZWNrZW09b24maW51bT1vbiZmbG5hbWU9b24mZW1haWw9b24mdXNlcm49b24mY291cnNlbmFtZT1vbiZzaXNjSUQ9b24mY291cnNlbnVtPW9uJnNlY251bT1vbiZzaXN0SUQ9/b24maWVtYWlsPW9uJmlmbmFtZT1vbiZpbG5hbWU9b24mbW9kdWxlPW9uJmxuYW1lPW9uJmxpZD1vbiZncmFkZT1vbiZwb2ludHM9MSZoYWJpdHVkZV9MTVM9Q2FudmFzJmhhYml0dWRlX1dlZWtObz0xMiZsb2M9bmV30",
-                    'new_tab': false
-                },
-                'submission_types': 'external_tool',
-                'omit_from_final_grade': true,
-                'published': true
-            }
-        }, (postError, newAssignment) => {
-            if (postError) {
-                callback(postError);
-            }
+                course.log('Created assignment', {
+                    'Assignment Name': newAssignment.name
+                });
 
-            course.log('Created assignment', {
-                'Assignment Name': newAssignment.name
+                callback(null, newAssignment);
             });
-
-            callback(null, newAssignment);
-        });
+        }
     };
 
     function createAssignments(individualModule, callback) {
         if (!individualModule) {
             callback(null, null);
         }
-        course.message("Creating new assignments.");
+        
 
         // Grabs name of the module so that we can extract the week number for later use
         var moduleTitle = individualModule.name;
@@ -184,12 +182,12 @@ module.exports = (course, stepCallback) => {
         // Depending the on week, do different tasks (e.g. create W12 feedback or W13 external url feedback)
         switch (weekNum) {
             case '05':
-            create_W05_feedback((error, assignment) => {
-                if (error) {
-                    callback(null, individualModule);
-                }
-                callback(null, individualModule, assignment);
-            });
+                create_W05_feedback((error, assignment) => {
+                    if (error) {
+                        callback(null, individualModule);
+                    }
+                    callback(null, individualModule, assignment);
+                });
                 break;
             case '12':
                 create_W12_feedback((error, assignment) => {
@@ -204,7 +202,7 @@ module.exports = (course, stepCallback) => {
                 break;
             default:
                 // Module doesn't match these three cases.
-                callback(null, individualModule, null);
+                callback(null, null, null);
                 break;
         };
     }
@@ -214,7 +212,7 @@ module.exports = (course, stepCallback) => {
             callback(null, null);
         }
 
-        course.message("Inserting into modules");
+        // course.message("Inserting into modules");
 
         // Checks if the "new Assignment" is the external URL
         if (newAssignment === "ExternalURL") {
@@ -231,9 +229,12 @@ module.exports = (course, stepCallback) => {
                     callback(postError);
                 }
 
-                course.message(`Successfully added the ${newModuleItem.title} to ${individualModule.name}`);
+                course.log('Created module item', {
+                    'Module Name': individualModule.name,
+                    'Module Item Inserted': newModuleItem.title
+                });
             });
-        } else if(newAssignment != null) {
+        } else if (newAssignment != null) {
             canvas.post(`/api/v1/courses/${canvasId}/modules/${individualModule.id}/items`, {
                 module_item: {
                     'type': 'Assignment',
@@ -244,8 +245,10 @@ module.exports = (course, stepCallback) => {
                 if (postError) {
                     callback(postError);
                 }
-
-                course.message(`Successfully added ${newAssignment.name} to ${individualModule.name}`);
+                course.log('Created module item', {
+                    'Module Name': individualModule.name,
+                    'Module Item Inserted': newAssignment.name
+                });
             });
         } else {
             callback(null, null);
@@ -258,7 +261,6 @@ module.exports = (course, stepCallback) => {
         functions = [
             /* This allows you to pass 'module' to the first function in waterfall */
             asyncLib.constant(individualModule),
-            checkForExistingAssignments,
             createAssignments,
             insertModuleItems
         ];
