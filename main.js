@@ -55,8 +55,6 @@ module.exports = (course, stepCallback) => {
     }
 
     function create_W05_feedback(callback) {
-        var doesExist = false;
-
         canvas.getAssignments(canvasId, (error, assignments) => {
             if (error) {
                 callback(error);
@@ -67,46 +65,38 @@ module.exports = (course, stepCallback) => {
 
             // If so... do not create another one.
             if (existingFeedbackAssignment.length > 0) {
-                // callback(null, null);
-                doesExist = true;
-                return;
+                course.message("'W05 Student Feedback to Instructor' already exists");
+                callback(null, null);
+            } else {
+                canvas.post(`/api/v1/courses/${canvasId}/assignments`, {
+                    assignment: {
+                        'name': `W05 Student Feedback to Instructor`,
+                        // "description": `The name of the module that this will go in is, ${individualModule.name}`,
+                        'external_tool_tag_attributes': {
+                            'url': "https://byui-lti-to-url.azurewebsites.net:443/Home/UrlRoute/ZHVybD1odHRwcyUzQSUyRiUyRmJ5dWkuYXoxLnF1YWx0cmljcy5jb20lMkZqZmUlMkZmb3JtJTJGU1ZfM09oT3dPZE9XU2owSzhkJmNoZWNrZW09b24maW51bT1vbiZmbG5hbWU9b24mZW1haWw9b24mdXNlcm49b24mY291cnNlbmFtZT1vbiZzaXNjSUQ9b24mY291cnNlbnVtPW9uJnNlY251bT1vbiZzaXN0SUQ9/b24maWVtYWlsPW9uJmlmbmFtZT1vbiZpbG5hbWU9b24mbW9kdWxlPW9uJmxuYW1lPW9uJmxpZD1vbiZncmFkZT1vbiZwb2ludHM9MSZoYWJpdHVkZV9MTVM9Q2FudmFzJmhhYml0dWRlX1dlZWtObz01JmxvYz1uZXc1",
+                            'new_tab': false
+                        },
+                        'submission_types': 'external_tool',
+                        'omit_from_final_grade': true,
+                        'published': true
+                    }
+                }, (postError, newAssignment) => {
+                    if (postError) {
+                        callback(postError);
+                    }
+
+                    course.log('Created assignment', {
+                        'Assignment Name': newAssignment.name
+                    });
+
+                    callback(null, newAssignment);
+                });
             }
 
         });
-        // This if statement runs before the "getAssignments" above ----------------------------------------------------------------------------------------------------
-        if (doesExist) {
-            course.message("Assignment already exists.");
-            callback(null, null);
-            return;
-        } else {
-            canvas.post(`/api/v1/courses/${canvasId}/assignments`, {
-                assignment: {
-                    'name': `W05 Student Feedback to Instructor`,
-                    // "description": `The name of the module that this will go in is, ${individualModule.name}`,
-                    'external_tool_tag_attributes': {
-                        'url': "https://byui-lti-to-url.azurewebsites.net:443/Home/UrlRoute/ZHVybD1odHRwcyUzQSUyRiUyRmJ5dWkuYXoxLnF1YWx0cmljcy5jb20lMkZqZmUlMkZmb3JtJTJGU1ZfM09oT3dPZE9XU2owSzhkJmNoZWNrZW09b24maW51bT1vbiZmbG5hbWU9b24mZW1haWw9b24mdXNlcm49b24mY291cnNlbmFtZT1vbiZzaXNjSUQ9b24mY291cnNlbnVtPW9uJnNlY251bT1vbiZzaXN0SUQ9/b24maWVtYWlsPW9uJmlmbmFtZT1vbiZpbG5hbWU9b24mbW9kdWxlPW9uJmxuYW1lPW9uJmxpZD1vbiZncmFkZT1vbiZwb2ludHM9MSZoYWJpdHVkZV9MTVM9Q2FudmFzJmhhYml0dWRlX1dlZWtObz01JmxvYz1uZXc1",
-                        'new_tab': false
-                    },
-                    'submission_types': 'external_tool',
-                    'omit_from_final_grade': true,
-                    'published': true
-                }
-            }, (postError, newAssignment) => {
-                if (postError) {
-                    callback(postError);
-                }
-
-                course.log('Created assignment', {
-                    'Assignment Name': newAssignment.name
-                });
-
-                callback(null, newAssignment);
-            });
-        }
     };
 
     function create_W12_feedback(callback) {
-        var doesExist = false;
         canvas.getAssignments(canvasId, (error, assignments) => {
             if (error) {
                 callback(error);
@@ -114,52 +104,45 @@ module.exports = (course, stepCallback) => {
             }
             // See if any of the assignment names include "W05 Student Feedback to Instructor"
             // Change this to "W12 Student Feedback to Instructor" when you're done testing -------------------------------------------------------------------------------------------
-            var existingFeedbackAssignment = assignments.filter(assignment => assignment.name.includes("W05 Student Feedback to Instructor"));
+            var existingFeedbackAssignment = assignments.filter(assignment => assignment.name.includes("W12 Student Feedback to Instructor"));
 
             // If so... do not create another one.
             if (existingFeedbackAssignment.length > 0) {
-                // callback(null, null);
-                doesExist = true;
+                course.message("'W12 Student Feedback to Instructor' already exists");
+                callback(null, null);
                 return;
-            }
+            } else {
+                canvas.post(`/api/v1/courses/${canvasId}/assignments`, {
+                    assignment: {
+                        'name': `W12 Student Feedback to Instructor`,
+                        // "description": `The name of the module that this will go in is, ${individualModule.name}`,
+                        'external_tool_tag_attributes': {
+                            'url': "https://byui-lti-to-url.azurewebsites.net:443/Home/UrlRoute/ZHVybD1odHRwcyUzQSUyRiUyRmJ5dWkuYXoxLnF1YWx0cmljcy5jb20lMkZqZmUlMkZmb3JtJTJGU1ZfODZNZThkUGt4WmxVMEhiJmNoZWNrZW09b24maW51bT1vbiZmbG5hbWU9b24mZW1haWw9b24mdXNlcm49b24mY291cnNlbmFtZT1vbiZzaXNjSUQ9b24mY291cnNlbnVtPW9uJnNlY251bT1vbiZzaXN0SUQ9/b24maWVtYWlsPW9uJmlmbmFtZT1vbiZpbG5hbWU9b24mbW9kdWxlPW9uJmxuYW1lPW9uJmxpZD1vbiZncmFkZT1vbiZwb2ludHM9MSZoYWJpdHVkZV9MTVM9Q2FudmFzJmhhYml0dWRlX1dlZWtObz0xMiZsb2M9bmV30",
+                            'new_tab': false
+                        },
+                        'submission_types': 'external_tool',
+                        'omit_from_final_grade': true,
+                        'published': true
+                    }
+                }, (postError, newAssignment) => {
+                    if (postError) {
+                        callback(postError);
+                    }
 
-        });
-        if (doesExist) {
-            course.message("Assignment already exists.");
-            callback(null, null);
-            return;
-        } else {
-            canvas.post(`/api/v1/courses/${canvasId}/assignments`, {
-                assignment: {
-                    'name': `W12 Student Feedback to Instructor`,
-                    // "description": `The name of the module that this will go in is, ${individualModule.name}`,
-                    'external_tool_tag_attributes': {
-                        'url': "https://byui-lti-to-url.azurewebsites.net:443/Home/UrlRoute/ZHVybD1odHRwcyUzQSUyRiUyRmJ5dWkuYXoxLnF1YWx0cmljcy5jb20lMkZqZmUlMkZmb3JtJTJGU1ZfODZNZThkUGt4WmxVMEhiJmNoZWNrZW09b24maW51bT1vbiZmbG5hbWU9b24mZW1haWw9b24mdXNlcm49b24mY291cnNlbmFtZT1vbiZzaXNjSUQ9b24mY291cnNlbnVtPW9uJnNlY251bT1vbiZzaXN0SUQ9/b24maWVtYWlsPW9uJmlmbmFtZT1vbiZpbG5hbWU9b24mbW9kdWxlPW9uJmxuYW1lPW9uJmxpZD1vbiZncmFkZT1vbiZwb2ludHM9MSZoYWJpdHVkZV9MTVM9Q2FudmFzJmhhYml0dWRlX1dlZWtObz0xMiZsb2M9bmV30",
-                        'new_tab': false
-                    },
-                    'submission_types': 'external_tool',
-                    'omit_from_final_grade': true,
-                    'published': true
-                }
-            }, (postError, newAssignment) => {
-                if (postError) {
-                    callback(postError);
-                }
+                    course.log('Created assignment', {
+                        'Assignment Name': newAssignment.name
+                    });
 
-                course.log('Created assignment', {
-                    'Assignment Name': newAssignment.name
+                    callback(null, newAssignment);
                 });
-
-                callback(null, newAssignment);
-            });
-        }
+            }
+        });
     };
 
     function createAssignments(individualModule, callback) {
         if (!individualModule) {
             callback(null, null);
         }
-        
 
         // Grabs name of the module so that we can extract the week number for later use
         var moduleTitle = individualModule.name;
@@ -184,16 +167,18 @@ module.exports = (course, stepCallback) => {
             case '05':
                 create_W05_feedback((error, assignment) => {
                     if (error) {
-                        callback(null, individualModule);
+                        callback(error, individualModule);
                     }
+                    // If assignment already exists, (null, individualModule, null) gets passed to the next function
                     callback(null, individualModule, assignment);
                 });
                 break;
             case '12':
                 create_W12_feedback((error, assignment) => {
                     if (error) {
-                        callback(null, individualModule);
+                        callback(error, individualModule);
                     }
+                    // If assignment already exists, (null, individualModule, null) gets passed to the next function
                     callback(null, individualModule, assignment);
                 });
                 break;
@@ -208,8 +193,9 @@ module.exports = (course, stepCallback) => {
     }
 
     function insertModuleItems(individualModule, newAssignment, callback) {
-        if (!individualModule) {
-            callback(null, null);
+        if (individualModule === null || newAssignment === null) {
+            callback(null, null, null);
+            return;
         }
 
         // course.message("Inserting into modules");
@@ -227,14 +213,16 @@ module.exports = (course, stepCallback) => {
             }, (postError, newModuleItem) => {
                 if (postError) {
                     callback(postError);
+                    return;
                 }
 
                 course.log('Created module item', {
                     'Module Name': individualModule.name,
                     'Module Item Inserted': newModuleItem.title
                 });
+                callback(null, newModuleItem, individualModule);
             });
-        } else if (newAssignment != null) {
+        } else {
             canvas.post(`/api/v1/courses/${canvasId}/modules/${individualModule.id}/items`, {
                 module_item: {
                     'type': 'Assignment',
@@ -244,16 +232,37 @@ module.exports = (course, stepCallback) => {
             }, (postError) => {
                 if (postError) {
                     callback(postError);
+                    return;
                 }
                 course.log('Created module item', {
                     'Module Name': individualModule.name,
                     'Module Item Inserted': newAssignment.name
                 });
+                callback(null, null, individualModule);
             });
-        } else {
-            callback(null, null);
         }
-        callback(null, individualModule);
+
+        
+    }
+
+    function publishItems(moduleItem, individualModule, callback) {
+        if (individualModule === null || moduleItem === null) {
+            callback(null, null);
+            return;
+        }
+
+        canvas.put(`/api/v1/courses/${canvasId}/modules/${individualModule.id}/items/${moduleItem.id}`, {
+            module_item: {
+                'published': true
+            }
+        }, (updateError) => {
+            if (updateError) {
+                callback(updateError);
+                return;
+            }
+
+            callback(null, individualModule);
+        });
     }
 
     function asyncWaterfall(individualModule, callback) {
@@ -262,7 +271,8 @@ module.exports = (course, stepCallback) => {
             /* This allows you to pass 'module' to the first function in waterfall */
             asyncLib.constant(individualModule),
             createAssignments,
-            insertModuleItems
+            insertModuleItems,
+            publishItems
         ];
 
         asyncLib.waterfall(functions, error => {
