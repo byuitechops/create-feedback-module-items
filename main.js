@@ -1,29 +1,24 @@
 /*eslint-env node, es6*/
 
-/* Module Description */
+/* Create Feedback Module Items */
 
-/* Put dependencies here */
+/***********************************************************************
+ * Creates the W05, W12 ,and W13 feedback module items.
+ * Specifically W05 Student Feedback to Instructor, 
+ * W12 Student Feedback to Instructor, and  W13 End-of-Course Evaluation
+************************************************************************/
+
 const canvas = require('canvas-wrapper');
 const asyncLib = require('async');
 
 
 module.exports = (course, stepCallback) => {
 
-    course.log('Table description', { column: 'value' });
-    var canvasId = course.info.canvasOU;
+    // Get the courses unique ID
+    const canvasId = course.info.canvasOU;
+    const validNames = ["Lesson", "Week", "Unit", "Module"];
 
-
-    /* You should never call the stepCallback with an error. We want the
-    whole program to run when testing so we can catch all existing errors */
-
-    // Add "W05 Student Feedback to Instructor" to Week 05 (LTI assignment)
-
-    // Add "W12 Student Evaluation of Instructor" to Week 12 (LTI assignment)
-
-    // Add "W13 End-of-Course Evaluation" to Week 13 (link)
-
-
-    // Get modules
+    // Get all the modules from the course
     function getModules() {
         canvas.getModules(canvasId, (error, modules) => {
             if (error) {
@@ -31,22 +26,19 @@ module.exports = (course, stepCallback) => {
                 stepCallback(null, course);
                 return;
             }
-
-            course.message(`Successfully retrieved ${modules.length} modules.`);
-
+            
+            // Creates a filtered list of the weeks we are working with
             filteredModules = modules.filter(m => {
                 // Filters for week 05, 12, and 13
-                return /(Week|Lesson):?\s*(05|12|13(\D|$))/gi.test(m.name);
-            });
-
-            // console.log(filteredModules);            
+                return /(?:Week|Lesson|Unit|Module):?\s*(0?5|12|13)/gi.test(m.name);
+            });    
 
             // Runs asyncWaterfall for each module
             asyncLib.eachSeries(filteredModules, asyncWaterfall, error => {
                 if (error) {
                     course.error(error);
                 } else {
-                    course.message("Successfully created feedback module items.");
+                    course.message("Successfully created feedback module items!");
                 }
 
                 stepCallback(null, course);
@@ -65,7 +57,7 @@ module.exports = (course, stepCallback) => {
 
             // If so... do not create another one.
             if (existingFeedbackAssignment.length > 0) {
-                course.message("'W05 Student Feedback to Instructor' already exists");
+                course.warning("'W05 Student Feedback to Instructor' already exists");
                 callback(null, null);
             } else {
                 canvas.post(`/api/v1/courses/${canvasId}/assignments`, {
@@ -108,7 +100,7 @@ module.exports = (course, stepCallback) => {
 
             // If so... do not create another one.
             if (existingFeedbackAssignment.length > 0) {
-                course.message("'W12 Student Feedback to Instructor' already exists");
+                course.warning("'W12 Student Feedback to Instructor' already exists");
                 callback(null, null);
                 return;
             } else {
@@ -141,26 +133,20 @@ module.exports = (course, stepCallback) => {
 
     function createAssignments(individualModule, callback) {
         if (!individualModule) {
-            callback(null, null);
+            callback(new Error("Module is undefined"));
+            return;
         }
 
         // Grabs name of the module so that we can extract the week number for later use
         var moduleTitle = individualModule.name;
-        var titleArray = moduleTitle.split(' ');
 
         /* Get the week number */
-        /* Add 0 to week number if not present */
-        titleArray.forEach((item, index) => {
-            if (item == 'Week' || item == 'Lesson') {
-                /* Replace each non-digit with nothing */
-                weekNum = titleArray[index + 1].replace(/\D+/g, '');
+        var weekNum = moduleTitle.match(/(?:Week|Lesson|Unit|Module):?\s*(0?5|12|13)/gi)[0].split(' ')[1];
 
-                if (weekNum.length == 1) {
-                    /* Add 0 to the beginning of the number if single digit */
-                    weekNum = weekNum.replace(/^/, '0');
-                }
-            }
-        });
+        /* If week number is only one digit, add a leading 0 */
+        if (weekNum.length === 1) {
+            weekNum = `0${weekNum}`;
+        }
 
         // Depending the on week, do different tasks (e.g. create W12 feedback or W13 external url feedback)
         switch (weekNum) {
@@ -197,8 +183,6 @@ module.exports = (course, stepCallback) => {
             callback(null, null, null);
             return;
         }
-
-        // course.message("Inserting into modules");
 
         // Checks if the "new Assignment" is the external URL
         if (newAssignment === "ExternalURL") {
@@ -242,7 +226,7 @@ module.exports = (course, stepCallback) => {
             });
         }
 
-        
+
     }
 
     function publishItems(moduleItem, individualModule, callback) {
@@ -289,11 +273,5 @@ module.exports = (course, stepCallback) => {
     * * * START HERE
     * *
     * * * * * * * */
-    if (course.settings.online === false) {
-        course.warning('Not an online course, this child module should not run.');
-        stepCallback(null, course);
-        return;
-    } else {
-        getModules();
-    }
+   getModules();
 };

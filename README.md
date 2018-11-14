@@ -1,58 +1,37 @@
 # Child Module Title
-### *Package Name*: child-module-title
-### *Child Type*: <post/pre import>
-### *Platform*: <online/pathway/campus/all> (Ask Zach or Daniel about this)
-### *Required*: <Required/Recommended/Optional> (Ask Zach or Daniel about this)
+### *Package Name*: create-feedback-module-item
+### *Child Type*: post import
+### *Platform*: online
+### *Required*: required
 
 This child module is built to be used by the Brigham Young University - Idaho D2L to Canvas Conversion Tool. It utilizes the standard `module.exports => (course, stepCallback)` signature and uses the Conversion Tool's standard logging functions. You can view extended documentation [Here](https://github.com/byuitechops/d2l-to-canvas-conversion-tool/tree/master/documentation).
 
 ## Purpose
 
-Describe the reason why this child module exists, and its goals.
+The purpose of this child module is to create and insert the feedback module items. Namely W05 Student Feedback to Instructor, W12 Student Feedback to Instructor, and  W13 End-of-Course Evaluation.
 
 ## How to Install
 
 ```
-npm install my-child-module
+npm install github:byuitechops/create-feedback-module-item
 ```
-
-## Run Requirements
-
-List any necessary requirements, such as fields on the `course.info` object. Include if it needs to run first, last, or similar stipulations. 
-
-## Options
-
-If there are options that need to be set before the module runs, include them in a table, like this:
-
-| Option | Values | Description |
-|--------|--------|-------------|
-|Create Lesson Folders| true/false | Determines if lesson folders should be created inside of "documents" and "media."|
-|Remove Course Image| true/false | Determines if the course image will be removed. |
-
-## Outputs
-
-If your module adds anything to `course.info` or anywhere else on the course object, please include a description of each in a table:
-
-| Option | Type | Location |
-|--------|--------|-------------|
-|Lesson Folders| Array | course.info|
 
 ## Process
 
 Describe in steps how the module accomplishes its goals.
 
-1. Does this thing
-2. Does that thing
-3. Does that other thing
+1. Acquires all the modules
+2. Filters through for the modules we want (Week 05, 12, 13)
+3. Creates feedback items for each week
+4. Inserts them into their respective modules
 
 ## Log Categories
 
 List the categories used in logging data in your module.
 
-- Discussions Created
-- Canvas Files Deleted
-- etc.
+- Created assignment
+- Created module item
 
 ## Requirements
 
-These are the expectations for the child module. What does it need to do? What is the "customer" wanting from it? 
+This child module is supposed to create and insert the feedback module items. Namely W05 Student Feedback to Instructor, W12 Student Feedback to Instructor, and  W13 End-of-Course Evaluation. W05 and W12 will be external tools stored in assignments and W13 is simply an external URL.
