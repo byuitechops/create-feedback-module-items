@@ -26,12 +26,12 @@ module.exports = (course, stepCallback) => {
                 stepCallback(null, course);
                 return;
             }
-            
+
             // Creates a filtered list of the weeks we are working with
             filteredModules = modules.filter(m => {
                 // Filters for week 05, 12, and 13
                 return /(?:Week|Lesson|Unit|Module):?\s*(0?5|12|13)/gi.test(m.name);
-            });    
+            });
 
             // Runs asyncWaterfall for each module
             asyncLib.eachSeries(filteredModules, asyncWaterfall, error => {
@@ -65,8 +65,10 @@ module.exports = (course, stepCallback) => {
                         'name': `W05 Student Feedback to Instructor`,
                         // "description": `The name of the module that this will go in is, ${individualModule.name}`,
                         'external_tool_tag_attributes': {
-                            'url': "https://byui-lti-to-url.azurewebsites.net:443/Home/UrlRoute/ZHVybD1odHRwcyUzQSUyRiUyRmJ5dWkuYXoxLnF1YWx0cmljcy5jb20lMkZqZmUlMkZmb3JtJTJGU1ZfM09oT3dPZE9XU2owSzhkJmNoZWNrZW09b24maW51bT1vbiZmbG5hbWU9b24mZW1haWw9b24mdXNlcm49b24mY291cnNlbmFtZT1vbiZzaXNjSUQ9b24mY291cnNlbnVtPW9uJnNlY251bT1vbiZzaXN0SUQ9/b24maWVtYWlsPW9uJmlmbmFtZT1vbiZpbG5hbWU9b24mbW9kdWxlPW9uJmxuYW1lPW9uJmxpZD1vbiZncmFkZT1vbiZwb2ludHM9MSZoYWJpdHVkZV9MTVM9Q2FudmFzJmhhYml0dWRlX1dlZWtObz01JmxvYz1uZXc1",
-                            'new_tab': false
+                            'url': "https://byui-lti-to-url.azurewebsites.net/Home/UrlRoute/ZHVybD1odHRwcyUzQSUyRiUyRmJ5dWkuYXoxLnF1YWx0cmljcy5jb20lMkZqZmUlMkZmb3JtJTJGU1ZfM09oT3dPZE9XU2owSzhkJmNoZWNrZW09b24maW51bT1vbiZmbG5hbWU9b24mZW1haWw9b24mdXNlcm49b24mY291cnNlbmFtZT1vbiZzaXNjSUQ9b24mY291cnNlbnVtPW9uJnNlY251bT1vbiZzaXN0SUQ9/b24maWVtYWlsPW9uJmlmbmFtZT1vbiZpbG5hbWU9b24mbW9kdWxlPW9uJmxuYW1lPW9uJmxpZD1vbiZncmFkZT1vbiZwb2ludHM9MSZoYWJpdHVkZV9MTVM9Q2FudmFzJmhhYml0dWRlX1dlZWtObz01JmxvYz1uZXc1",
+                            'content_type': "context_external_tool",
+                            "content_id": "167",
+                            'new_tab': 0
                         },
                         'submission_types': 'external_tool',
                         'omit_from_final_grade': true,
@@ -109,8 +111,10 @@ module.exports = (course, stepCallback) => {
                         'name': `W12 Student Feedback to Instructor`,
                         // "description": `The name of the module that this will go in is, ${individualModule.name}`,
                         'external_tool_tag_attributes': {
-                            'url': "https://byui-lti-to-url.azurewebsites.net:443/Home/UrlRoute/ZHVybD1odHRwcyUzQSUyRiUyRmJ5dWkuYXoxLnF1YWx0cmljcy5jb20lMkZqZmUlMkZmb3JtJTJGU1ZfODZNZThkUGt4WmxVMEhiJmNoZWNrZW09b24maW51bT1vbiZmbG5hbWU9b24mZW1haWw9b24mdXNlcm49b24mY291cnNlbmFtZT1vbiZzaXNjSUQ9b24mY291cnNlbnVtPW9uJnNlY251bT1vbiZzaXN0SUQ9/b24maWVtYWlsPW9uJmlmbmFtZT1vbiZpbG5hbWU9b24mbW9kdWxlPW9uJmxuYW1lPW9uJmxpZD1vbiZncmFkZT1vbiZwb2ludHM9MSZoYWJpdHVkZV9MTVM9Q2FudmFzJmhhYml0dWRlX1dlZWtObz0xMiZsb2M9bmV30",
-                            'new_tab': false
+                            'url': "https://byui-lti-to-url.azurewebsites.net/Home/UrlRoute/ZHVybD1odHRwcyUzQSUyRiUyRmJ5dWkuYXoxLnF1YWx0cmljcy5jb20lMkZqZmUlMkZmb3JtJTJGU1ZfODZNZThkUGt4WmxVMEhiJmNoZWNrZW09b24maW51bT1vbiZmbG5hbWU9b24mZW1haWw9b24mdXNlcm49b24mY291cnNlbmFtZT1vbiZzaXNjSUQ9b24mY291cnNlbnVtPW9uJnNlY251bT1vbiZzaXN0SUQ9/b24maWVtYWlsPW9uJmlmbmFtZT1vbiZpbG5hbWU9b24mbW9kdWxlPW9uJmxuYW1lPW9uJmxpZD1vbiZncmFkZT1vbiZwb2ludHM9MSZoYWJpdHVkZV9MTVM9Q2FudmFzJmhhYml0dWRlX1dlZWtObz0xMiZsb2M9bmV30",
+                            'content_type': "context_external_tool",
+                            "content_id": "167",
+                            'new_tab': 0
                         },
                         'submission_types': 'external_tool',
                         'omit_from_final_grade': true,
@@ -273,5 +277,5 @@ module.exports = (course, stepCallback) => {
     * * * START HERE
     * *
     * * * * * * * */
-   getModules();
+    getModules();
 };
