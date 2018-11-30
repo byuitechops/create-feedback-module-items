@@ -30,7 +30,7 @@ module.exports = (course, stepCallback) => {
             // Creates a filtered list of the weeks we are working with
             filteredModules = modules.filter(m => {
                 // Filters for week 05, 12, and 13
-                return /(?:Week|Lesson|Unit|Module):?\s*(0?5|12|13)/gi.test(m.name);
+                return /(?:Week|Lesson|Module):?\s*(0?5|12|13)/gi.test(m.name);
             });
 
             // Runs asyncWaterfall for each module
