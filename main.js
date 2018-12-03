@@ -14,11 +14,16 @@ const asyncLib = require('async');
 
 module.exports = (course, stepCallback) => {
 
-    // Get the courses unique ID
+    // Get the course's unique ID
     const canvasId = course.info.canvasOU;
-    const validNames = ["Lesson", "Week", "Unit", "Module"];
 
-    // Get all the modules from the course
+    /***********************************************************************
+     * getModules function
+     * Goes through the whole course and finds week 05, 12, and 13 
+     * and puts them in a list.
+     * For each week it runs the asyncwaterfall with a series of functions
+     * (asyncwaterfall found farther down in the code)
+    ************************************************************************/
     function getModules() {
         canvas.getModules(canvasId, (error, modules) => {
             if (error) {
@@ -29,11 +34,11 @@ module.exports = (course, stepCallback) => {
 
             // Creates a filtered list of the weeks we are working with
             filteredModules = modules.filter(m => {
-                // Filters for week 05, 12, and 13
+                // Filters for week 05, 12, and 13 with regex
                 return /(?:Week|Lesson|Module):?\s*(0?5|12|13)/gi.test(m.name);
             });
 
-            // Runs asyncWaterfall for each module
+            // Runs asyncWaterfall for each module found above
             asyncLib.eachSeries(filteredModules, asyncWaterfall, error => {
                 if (error) {
                     course.error(error);
@@ -46,6 +51,11 @@ module.exports = (course, stepCallback) => {
         });
     }
 
+    /***********************************************************************
+     * create_W05_feedback function
+     * Called in the createAssignments function if Week/Module 05 is found. 
+     * This creates the 'W05 Student Feedback to Instructor' external_tool
+    ************************************************************************/
     function create_W05_feedback(callback) {
         canvas.getAssignments(canvasId, (error, assignments) => {
             if (error) {
@@ -90,6 +100,11 @@ module.exports = (course, stepCallback) => {
         });
     };
 
+    /***********************************************************************
+     * create_W12_feedback function
+     * Called in the createAssignments function if Week/Module 12 is found. 
+     * This creates the 'W12 Student Feedback to Instructor' external_tool
+    ************************************************************************/
     function create_W12_feedback(callback) {
         canvas.getAssignments(canvasId, (error, assignments) => {
             if (error) {
@@ -135,24 +150,32 @@ module.exports = (course, stepCallback) => {
         });
     };
 
+    /***********************************************************************
+     * createAssignments function
+     * First function in the asyncwaterfall. Grabs the week number from the 
+     * week/module title. After doing so runs a switch statement to see
+     * which feedback module item to create. 
+     * (W05, W12, and W13 being the three options)
+    ************************************************************************/
     function createAssignments(individualModule, callback) {
+        // If the module (week 05, 12, etc.) can't be found, call this error.
         if (!individualModule) {
-            callback(new Error("Module is undefined"));
+            callback(new Error("Module can't be found."));
             return;
         }
 
         // Grabs name of the module so that we can extract the week number for later use
         var moduleTitle = individualModule.name;
 
-        /* Get the week number */
+        // Get the week number
         var weekNum = moduleTitle.match(/(?:Week|Lesson|Unit|Module):?\s*(0?5|12|13)/gi)[0].split(' ')[1];
 
-        /* If week number is only one digit, add a leading 0 */
+        // If week number is only one digit, add a leading 0
         if (weekNum.length === 1) {
             weekNum = `0${weekNum}`;
         }
 
-        // Depending the on week, do different tasks (e.g. create W12 feedback or W13 external url feedback)
+        // Depending on the week, do different tasks (e.g. create W12 feedback or W13 external url feedback)
         switch (weekNum) {
             case '05':
                 create_W05_feedback((error, assignment) => {
@@ -182,6 +205,11 @@ module.exports = (course, stepCallback) => {
         };
     }
 
+    /***********************************************************************
+     * insertModuleItems function
+     * Inserts the newly created assignment or external URL into it's proper
+     * module/week.
+    ************************************************************************/
     function insertModuleItems(individualModule, newAssignment, callback) {
         if (individualModule === null || newAssignment === null) {
             callback(null, null, null);
@@ -233,6 +261,10 @@ module.exports = (course, stepCallback) => {
 
     }
 
+    /***********************************************************************
+     * publishItems function
+     * Publishes the assignments that were recently inserted into the modules.
+    ************************************************************************/
     function publishItems(moduleItem, individualModule, callback) {
         if (individualModule === null || moduleItem === null) {
             callback(null, null);
@@ -253,6 +285,13 @@ module.exports = (course, stepCallback) => {
         });
     }
 
+    /***********************************************************************
+     * asyncWaterfall function
+     * This is where the magic happens. This takes a list of functions
+     * (which are all declared above) and runs them asynchronously, but in 
+     * order. Specifically creates the assignments, inserts them into their
+     * respective module items, and then publishes them.
+    ************************************************************************/
     function asyncWaterfall(individualModule, callback) {
         // Array of functions to be run in the async waterfall below
         functions = [
