@@ -1,7 +1,7 @@
 {
   "name": "create-feedback-module-items",
   "version": "1.0.0",
-  "description": "Put your child module's description here",
+  "description": "The purpose of this child module is to create and insert the feedback module items. Namely W05 Student Feedback to Instructor, W12 Student Feedback to Instructor, and  W13 End-of-Course Evaluation.",
   "main": "main.js",
   "dependencies": {
     "canvas-wrapper": "github:byuitechops/canvas-wrapper"
